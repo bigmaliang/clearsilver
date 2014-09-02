@@ -23,6 +23,8 @@ $(streamhtmlparser_dir)/.libs/libstreamhtmlparser.a:
 	$(MAKE) -C $(streamhtmlparser_dir) PREFIX=$(prefix) || exit 1;
 
 libs/libstreamhtmlparser.a: $(streamhtmlparser_dir)/.libs/libstreamhtmlparser.a
+    rm -rf libs
+	mkdir libs
 	$(CP) $(streamhtmlparser_dir)/.libs/libstreamhtmlparser.a libs
 
 rules.mk: configure
