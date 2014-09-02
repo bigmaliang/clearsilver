@@ -791,7 +791,7 @@ NEOERR *cgi_parse (CGI *cgi)
 
   if (!strcmp(method, "POST"))
   {
-    if (type && !strcmp(type, "application/x-www-form-urlencoded"))
+    if (type && !strncmp(type, "application/x-www-form-urlencoded", 33))
     {
       err = _parse_post_form(cgi);
       if (err != STATUS_OK) return nerr_pass (err);

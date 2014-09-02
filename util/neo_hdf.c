@@ -559,7 +559,7 @@ NEOERR* _hdf_hash_level(HDF *hdf)
   NEOERR *err;
   HDF *child;
 
-  err = ne_hash_init(&(hdf->hash), hash_hdf_hash, hash_hdf_comp);
+  err = ne_hash_init(&(hdf->hash), hash_hdf_hash, hash_hdf_comp, NULL);
   if (err) return nerr_pass(err);
 
   child = hdf->child;
@@ -1015,6 +1015,8 @@ NEOERR* hdf_remove_tree (HDF *hdf, const char *name)
     lp->child = hp->next;
     hp->next = NULL;
   }
+  if (lp && lp->last_hp == hp) lp->last_hp = NULL;
+  if (lp && lp->last_hs == hp) lp->last_hs = NULL;
   _dealloc_hdf (&hp);
 
   return STATUS_OK;
@@ -1620,7 +1622,7 @@ static NEOERR* _hdf_read_string (HDF *hdf, const char **str, STRING *line,
     {
       /* Valid hdf name is [0-9a-zA-Z_.]+ */
       name = s;
-      while (*s && (isalnum(*s) || *s == '_' || *s == '.')) s++;
+      while (*s && (isalnum(*s) || *s == '_' || *s == '.' || *(unsigned char*)s > 127)) s++;
       SKIPWS(s);
 
       if (s[0] == '[') /* attributes */

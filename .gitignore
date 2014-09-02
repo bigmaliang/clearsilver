@@ -1,1 +1,5 @@
 .svn/
+*.lo
+*.depends
+*.[oa]
+*~

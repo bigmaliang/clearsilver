@@ -48,7 +48,7 @@ typedef struct _neo_err
   int error;
   int err_stack;
   int flags;
-  char desc[256];
+  char desc[1024];
   const char *file;
   const char *func;
   int lineno;
@@ -135,6 +135,8 @@ NEOERR *nerr_passf (const char *func, const char *file, int lineno,
 NEOERR *nerr_pass_ctxf (const char *func, const char *file, int lineno,
                         NEOERR *nerr, const char *fmt, ...)
                         ATTRIBUTE_PRINTF(5,6);
+
+char *_lookup_errname(NEOERR *err, char *buf, int buflen);
 
 /* function: nerr_log_error - print the error chain to stderr
  * description: prints out the error traceback to stderr

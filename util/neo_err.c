@@ -190,7 +190,7 @@ NEOERR *nerr_pass_ctxf (const char *func, const char *file, int lineno,
   return nerr;
 }
 
-static char *_lookup_errname(NEOERR *err, char *buf, int buflen)
+char *_lookup_errname(NEOERR *err, char *buf, int buflen)
 {
   char *err_name;
 
