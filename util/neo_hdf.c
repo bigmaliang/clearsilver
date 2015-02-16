@@ -1147,6 +1147,42 @@ static NEOERR *_string_dump_cb (void *rock, const char *fmt, ...)
 #define DUMP_TYPE_COMPACT 1
 #define DUMP_TYPE_PRETTY 2
 
+static NEOERR* hdf_dump_attr(HDF *hdf, void *rock, DUMPF_CB dump_cbf)
+{
+  NEOERR *err;
+
+  if (!hdf || !hdf->attr) return STATUS_OK;
+
+  HDF_ATTR *attr = hdf->attr;
+  char *v = NULL;
+
+  err = dump_cbf(rock, " [");
+  if (err) return nerr_pass(err);
+  while (attr != NULL)
+  {
+    if (attr->value == NULL || !strcmp(attr->value, "1"))
+      err = dump_cbf(rock, "%s", attr->key);
+    else
+    {
+      v = repr_string_alloc(attr->value);
+
+      if (v == NULL)
+        return nerr_raise(NERR_NOMEM, "Unable to repr attr %s value %s", attr->key, attr->value);
+      err = dump_cbf(rock, "%s=%s", attr->key, v);
+      free(v);
+    }
+    if (err) return nerr_pass(err);
+    if (attr->next)
+    {
+      err = dump_cbf(rock, ", ");
+      if (err) return nerr_pass(err);
+    }
+    attr = attr->next;
+  }
+  err = dump_cbf(rock, "] ");
+  return nerr_pass(err);
+}
+
 static NEOERR* hdf_dump_cb(HDF *hdf, const char *prefix, int dtype, int lvl,
                            void *rock, DUMPF_CB dump_cbf)
 {
@@ -1181,37 +1217,10 @@ static NEOERR* hdf_dump_cb(HDF *hdf, const char *prefix, int dtype, int lvl,
 	err = dump_cbf(rock, "%s%s", whsp, hdf->name);
       }
       if (err) return nerr_pass (err);
-      if (hdf->attr)
-      {
-	HDF_ATTR *attr = hdf->attr;
-	char *v = NULL;
 
-	err = dump_cbf(rock, " [");
-	if (err) return nerr_pass(err);
-	while (attr != NULL)
-	{
-	  if (attr->value == NULL || !strcmp(attr->value, "1"))
-	    err = dump_cbf(rock, "%s", attr->key);
-	  else
-	  {
-	    v = repr_string_alloc(attr->value);
+      err = hdf_dump_attr(hdf, rock, dump_cbf);
+      if (err != STATUS_OK) return nerr_pass(err);
 
-	    if (v == NULL)
-	      return nerr_raise(NERR_NOMEM, "Unable to repr attr %s value %s", attr->key, attr->value);
-	    err = dump_cbf(rock, "%s=%s", attr->key, v);
-	    free(v);
-	  }
-	  if (err) return nerr_pass(err);
-	  if (attr->next)
-	  {
-	    err = dump_cbf(rock, ", ");
-	    if (err) return nerr_pass(err);
-	  }
-	  attr = attr->next;
-	}
-	err = dump_cbf(rock, "] ");
-	if (err) return nerr_pass(err);
-      }
       if (strchr (hdf->value, '\n'))
       {
 	int vlen = strlen(hdf->value);
@@ -1245,8 +1254,15 @@ static NEOERR* hdf_dump_cb(HDF *hdf, const char *prefix, int dtype, int lvl,
       {
 	if (hdf->name && (dtype != DUMP_TYPE_DOTTED))
 	{
-	  err = dump_cbf(rock, "%s%s {\n", whsp, hdf->name);
+	  err = dump_cbf(rock, "%s%s", whsp, hdf->name);
 	  if (err) return nerr_pass (err);
+
+	  err = hdf_dump_attr(hdf, rock, dump_cbf);
+	  if (err != STATUS_OK) return nerr_pass(err);
+
+	  err = dump_cbf(rock, "{\n");
+	  if (err) return nerr_pass (err);
+
 	  err = hdf_dump_cb (hdf, hdf->name, dtype, lvl+1, rock, dump_cbf);
 	  if (err) return nerr_pass (err);
 	  err = dump_cbf(rock, "%s}\n", whsp);
@@ -1256,6 +1272,25 @@ static NEOERR* hdf_dump_cb(HDF *hdf, const char *prefix, int dtype, int lvl,
 	  err = hdf_dump_cb (hdf, hdf->name, dtype, lvl+1, rock, dump_cbf);
 	}
       }
+      if (err) return nerr_pass (err);
+    }
+    if (!hdf->value && !hdf->child)
+    {
+      if (hdf->link) op = ':';
+      if (prefix && (dtype == DUMP_TYPE_DOTTED))
+      {
+	err = dump_cbf(rock, "%s.%s", prefix, hdf->name);
+      }
+      else
+      {
+	err = dump_cbf(rock, "%s%s", whsp, hdf->name);
+      }
+      if (err) return nerr_pass (err);
+
+      err = hdf_dump_attr(hdf, rock, dump_cbf);
+      if (err != STATUS_OK) return nerr_pass(err);
+
+      err = dump_cbf(rock, " %c \n", op);
       if (err) return nerr_pass (err);
     }
     hdf = hdf->next;
