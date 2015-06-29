@@ -194,6 +194,7 @@ void hdf_destroy (HDF **hdf)
   {
     _dealloc_hdf(hdf);
   }
+  *hdf = NULL;
 }
 
 static int _walk_hdf (HDF *hdf, const char *name, HDF **node)
