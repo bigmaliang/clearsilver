@@ -23,9 +23,9 @@ typedef void (*NE_DESTROY_FUNC)(void *node);
 
 typedef struct _NE_HASHNODE
 {
+  UINT32 hashv;
   void *key;
   void *value;
-  UINT32 hashv;
   struct _NE_HASHNODE *next;
 } NE_HASHNODE;
 
@@ -34,10 +34,10 @@ typedef struct _HASH
   UINT32 size;
   UINT32 num;
 
-  NE_HASHNODE **nodes;
   NE_HASH_FUNC hash_func;
   NE_COMP_FUNC comp_func;
   NE_DESTROY_FUNC destroy_func;
+  NE_HASHNODE **nodes;
 } NE_HASH;
 
 NEOERR *ne_hash_init (NE_HASH **hash, NE_HASH_FUNC hash_func,

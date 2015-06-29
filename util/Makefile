@@ -8,6 +8,7 @@ include $(NEOTONIC_ROOT)/rules.mk
 
 REGEX_LIB = $(LIB_DIR)libregex.a
 
+#CPPFLAGS+= -I$(streamhtmlparser_includedir)  -pg -fprofile-arcs -ftest-coverage
 CPPFLAGS+= -I$(streamhtmlparser_includedir)
 LDFLAG+= -L$(streamhtmlparser_libdir)
 

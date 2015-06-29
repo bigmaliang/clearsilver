@@ -69,14 +69,14 @@ typedef struct _hdf HDF;
 /* HDFFILELOAD is a callback function to intercept file load requests and
  * provide templates via another mechanism.  This way you can load templates
  * that you compiled-into your binary, from in-memory caches, or from a
- * zip file, etc.  The HDF is provided so you can choose to use the 
+ * zip file, etc.  The HDF is provided so you can choose to use the
  * hdf_search_path function to find the file.  contents should return
  * a full malloc copy of the contents of the file, which the parser will
  * own and free.  Use hdf_register_fileload to set this function for
  * your top level HDF node.
- * NOTE: Technically, we shouldn't need a separate copy for each parse, but 
+ * NOTE: Technically, we shouldn't need a separate copy for each parse, but
  * using the separate copy makes this equivalent to the CSFILELOAD function.  We
- * can change this if we really want to save that copy at the expense of 
+ * can change this if we really want to save that copy at the expense of
  * slightly more complicated code. */
 typedef NEOERR* (*HDFFILELOAD)(void *ctx, HDF *hdf, const char *filename,
                               char **contents);
@@ -92,8 +92,8 @@ struct _hdf
 {
   int link;
   int alloc_value;
-  char *name;
   int name_len;
+  char *name;
   char *value;
   struct _attr *attr;
   struct _hdf *top;
@@ -119,7 +119,7 @@ struct _hdf
 /*
  * Function: hdf_init - Initialize an HDF data set
  * Description: hdf_init initializes an HDF data set and returns the
- *              pointer to the top node in the data set. 
+ *              pointer to the top node in the data set.
  * Input: hdf - pointer to an HDF pointer
  * Output: hdf - allocated hdf node
  * Returns: NERR_NOMEM - unable to allocate memory for dataset
@@ -146,7 +146,7 @@ void hdf_destroy (HDF **hdf);
  * Description: hdf_get_int_value walks the HDF data set pointed to by
  *              hdf to name, and returns the value of that node
  *              converted to an integer.  If that node does not exist,
- *              or it does not contain a number, the defval is returned.  
+ *              or it does not contain a number, the defval is returned.
  * Input: hdf -> a node in an HDF data set
  *        name -> the name of a node to walk to in the data set
  *        defval -> value to return in case of error or if the node
