@@ -97,8 +97,8 @@ NEOERR *ne_hash_insert(NE_HASH *hash, void *key, void *value)
     (*node)->key = key;
     (*node)->value = value;
     (*node)->next = NULL;
+    hash->num++;
   }
-  hash->num++;
 
   return _hash_resize(hash);
 }
@@ -248,9 +248,9 @@ static NEOERR *_hash_resize(NE_HASH *hash)
   {
     prev = NULL;
     next_bucket = x + orig_size;
-    for (entry = hash->nodes[x]; 
-	 entry; 
-	 entry = prev ? prev->next : hash->nodes[x]) 
+    for (entry = hash->nodes[x];
+	 entry;
+	 entry = prev ? prev->next : hash->nodes[x])
     {
       if ((entry->hashv & hash_mask) != x)
       {
@@ -271,7 +271,7 @@ static NEOERR *_hash_resize(NE_HASH *hash)
       }
     }
   }
-  
+
   return STATUS_OK;
 }
 
